@@ -75,7 +75,7 @@ PKG_CONFIG_PATH=$BUILD_DIR/lib/pkgconfig ./configure \
   --disable-decoders   \
   --enable-decoder=aac,pcm_alaw,pcm_mulaw,mp2,h264,mpeg2video,mp3,png,mjpeg,tiff,gif,bmp,libspeex,hevc,vp8,vp9,ac3 \
   --disable-encoders   \
-  --enable-encoder=aac,png,mjpeg \
+  --enable-encoder=aac,png,mjpeg,libx265 \
   --disable-muxers     \
   --disable-demuxers   \
   --enable-demuxer=mov,image2,gif,mp3,webm_dash_manifest \
@@ -92,6 +92,9 @@ PKG_CONFIG_PATH=$BUILD_DIR/lib/pkgconfig ./configure \
   --disable-ffplay     \
   --enable-libspeex    \
   --enable-libfreetype \
+  --enable-gpl         \
+  --enable-libx265     \
+  --enable-nonfree     \
   --disable-manpages
 make -j 4
 make install
