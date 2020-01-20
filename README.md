@@ -16,9 +16,13 @@ build_ffmpeg_4.1.4.sh - use this script to build FFmpeg package which can be fou
 build_ffmpeg_4.1.4_libx265.sh - this script builds FFmpeg with libx265
 
 Building this library wll require libx265-dev package to be installed. Run these commands for installation:
+
 For Ubuntu:
+
 apt-get install libx265-dev
+
 For CentOS:
+
 yum install libx265-dev
 
 
