@@ -8,12 +8,16 @@ Every custom library which is a result of building FFmpeg has its own licensing 
 
 **Default build**
 
-build_ffmpeg_4.1.4.sh - use this script to build FFmpeg package which can be found [here](http://nimblestreamer.com/sources/ffmpeg/).
+All FFmpeg packages and their respective builds [can be found here](http://nimblestreamer.com/sources/ffmpeg/).
+
+build_ffmpeg_4.3.2.sh  - use this script to build FFmpeg 4.3.2, the latest FFmpeg supported by Nimble Streamer
+
+build_ffmpeg_4.1.4.sh  - use this script to build FFmpeg 4.1.4
 
 
 **Building with libx265**
 
-build_ffmpeg_4.1.4_libx265.sh - this script builds FFmpeg with libx265
+build_ffmpeg_4.1.4_libx265.sh - this script builds FFmpeg 4.1.4 with libx265
 
 Building this library will require libx265-dev package to be installed. Run these commands for installation:
 
@@ -28,4 +32,4 @@ yum install libx265-dev
 
 **Building with AC3 and E-AC3**
 
-build_ffmpeg_4.1.4_ac3.sh - this script builds FFmpeg with AC3 and E-AC3 encoder libraries.
+build_ffmpeg_4.1.4_ac3.sh - this script builds FFmpeg 4.1.4 with AC3 and E-AC3 encoder libraries.
