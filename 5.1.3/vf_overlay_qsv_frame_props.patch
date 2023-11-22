@@ -1,0 +1,56 @@
+--- ffmpeg-4.3.1/libavfilter/vf_overlay_qsv.c.old 2020-07-09 19:17:46.000000000 +1000
++++ ffmpeg-4.3.1/libavfilter/vf_overlay_qsv.c	2020-12-24 14:58:02.878744498 +1000
+@@ -69,6 +69,9 @@
+     char     *overlay_ox, *overlay_oy, *overlay_ow, *overlay_oh;
+     uint16_t  overlay_alpha, overlay_pixel_alpha;
+ 
++    int                key_frame;
++    enum AVPictureType pict_type;
++
+ } QSVOverlayContext;
+ 
+ static const char *const var_names[] = {
+@@ -237,8 +240,17 @@
+ 
+     for (i = 0; i < ctx->nb_inputs; i++) {
+         ret = ff_framesync_get_frame(fs, i, &frame, 0);
+-        if (ret == 0)
++        if (ret == 0) {
++            if (i == 0) {
++                // qsv vpp filter makes each output frame to be key frame, so we have
++                // to copy frame props of frame coming to main input to output frame
++                s->key_frame = frame->key_frame;
++                s->pict_type = frame->pict_type;
++            }
++
+             ret = ff_qsvvpp_filter_frame(s->qsv, ctx->inputs[i], frame);
++        }
++
+         if (ret < 0 && ret != AVERROR(EAGAIN))
+             break;
+     }
+@@ -314,6 +326,12 @@
+     QSVOverlayContext *s = outlink->src->priv;
+     frame->pts = av_rescale_q(s->fs.pts,
+                               s->fs.time_base, outlink->time_base);
++    
++    // qsv vpp filter makes each output frame to be key frame, so we have
++    // to copy frame props of frame coming to main input to output frame
++    frame->key_frame = s->key_frame;
++    frame->pict_type = s->pict_type;
++
+     return ff_filter_frame(outlink, frame);
+ }
+ 
+@@ -342,6 +360,11 @@
+     vpp->qsv_param.out_sw_format = AV_PIX_FMT_NV12;
+     vpp->qsv_param.num_crop      = 0;
+ 
++    // init frame props, it will be overwritten with
++    // props from first frame coming to main input
++    vpp->key_frame = 0;
++    vpp->pict_type = AV_PICTURE_TYPE_NONE;
++
+     return 0;
+ }
+ 

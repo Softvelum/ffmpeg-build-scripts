@@ -1,0 +1,10 @@
+--- ffmpeg-4.3.1/libavcodec/qsvenc.c.old	2020-10-14 10:19:09.712881959 +1000
++++ ffmpeg-4.3.1/libavcodec/qsvenc.c	2020-10-14 10:21:04.503142225 +1000
+@@ -1241,6 +1241,7 @@
+             av_free(enc_ctrl->Payload[i]);
+         }
+         enc_ctrl->NumPayload = 0;
++        enc_ctrl->FrameType  = 0;
+     }
+ }
+ 

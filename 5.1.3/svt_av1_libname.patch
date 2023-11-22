@@ -1,0 +1,25 @@
+diff --git a/Source/Lib/Encoder/CMakeLists.txt b/Source/Lib/Encoder/CMakeLists.txt
+index 12badfd3..eec73a72 100644
+--- a/Source/Lib/Encoder/CMakeLists.txt
++++ b/Source/Lib/Encoder/CMakeLists.txt
+@@ -128,6 +128,7 @@ endif()
+ set_target_properties(SvtAv1Enc PROPERTIES VERSION ${ENC_VERSION})
+ set_target_properties(SvtAv1Enc PROPERTIES SOVERSION ${ENC_VERSION_MAJOR})
+ set_target_properties(SvtAv1Enc PROPERTIES C_VISIBILITY_PRESET hidden)
++set_target_properties(SvtAv1Enc PROPERTIES OUTPUT_NAME SvtAv1Enc-nimble)
+ target_link_libraries(SvtAv1Enc PUBLIC ${PLATFORM_LIBS})
+ if(NOT COMPILE_C_ONLY AND HAVE_X86_PLATFORM)
+     target_link_libraries(SvtAv1Enc PRIVATE cpuinfo_public)
+diff --git a/Source/Lib/Encoder/pkg-config.pc.in b/Source/Lib/Encoder/pkg-config.pc.in
+index ccd71472..572e296d 100644
+--- a/Source/Lib/Encoder/pkg-config.pc.in
++++ b/Source/Lib/Encoder/pkg-config.pc.in
+@@ -6,7 +6,7 @@ libdir=@SVT_AV1_LIBDIR@
+ Name: SvtAv1Enc
+ Description: SVT (Scalable Video Technology) for AV1 encoder library
+ Version: @ENC_VERSION_MAJOR@.@ENC_VERSION_MINOR@.@ENC_VERSION_PATCH@
+-Libs: -L${libdir} -lSvtAv1Enc
++Libs: -L${libdir} -lSvtAv1Enc-nimble
+ Libs.private: @LIBS_PRIVATE@
+ Cflags: -I${includedir}/svt-av1@ENC_PKG_CONFIG_EXTRA_CFLAGS@
+ Cflags.private: -UEB_DLL

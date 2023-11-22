@@ -1,0 +1,13 @@
+diff --git a/Source/Lib/Common/Codec/EbLog.h b/Source/Lib/Common/Codec/EbLog.h
+index 395fcabf..d65c6133 100644
+--- a/Source/Lib/Common/Codec/EbLog.h
++++ b/Source/Lib/Common/Codec/EbLog.h
+@@ -25,7 +25,7 @@ typedef enum {
+ } SvtLogLevel;
+ 
+ //define this to turn off all library log
+-//#define SVT_LOG_QUIET
++#define SVT_LOG_QUIET
+ #ifndef SVT_LOG_QUIET
+ 
+ //SVT_LOG will not output the prefix. you can contorl the output style.
