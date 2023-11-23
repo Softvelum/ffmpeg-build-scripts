@@ -386,8 +386,8 @@ build_ffmpeg() {
       FFMPEG_QUICKSYNC_OPTIONS="--disable-vaapi"
   fi
 
-  FFMPEG_DECODERS+=",libopus"
-  FFMPEG_ENCODERS+=",libopus"
+  FFMPEG_DECODERS+=",libopus,eac3"
+  FFMPEG_ENCODERS+=",libopus,ac3,eac3"
 
   FFMPEG_ENCODERS+=",mp2"
 
