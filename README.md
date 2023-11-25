@@ -15,9 +15,11 @@ Read [FFmpeg custom build support in Live Transcoder](https://blog.wmspanel.com/
 
 All FFmpeg packages and their respective builds [can be found here](http://nimblestreamer.com/sources/ffmpeg/).
 
-build_ffmpeg_4.3.2.sh  - use this script to build FFmpeg 4.3.2, the latest FFmpeg supported by Nimble Streamer
+5.1.3/build_nimble_transcoder_ffmpeg_5.1.3.sh - use this script to build FFmpeg 5.1.3, the latest FFmpeg supported by Nimble Streamer
 
-build_ffmpeg_4.1.4.sh  - use this script to build FFmpeg 4.1.4
+build_ffmpeg_4.3.2.sh - use this script to build FFmpeg 4.3.2
+
+build_ffmpeg_4.1.4.sh - use this script to build FFmpeg 4.1.4
 
 
 **Building with libx265**
@@ -37,4 +39,6 @@ yum install libx265-dev
 
 **Building with AC3 and E-AC3**
 
-build_ffmpeg_4.1.4_ac3.sh - this script builds FFmpeg 4.1.4 with AC3 and E-AC3 encoder libraries.
+5.1.3/build_nimble_transcoder_ffmpeg_5.1.3_with-eac3.sh - this script builds FFmpeg 5.1.3 with AC3 and E-AC3 encoders.
+
+build_ffmpeg_4.1.4_ac3.sh - this script builds FFmpeg 4.1.4 with AC3 and E-AC3 encoders.
