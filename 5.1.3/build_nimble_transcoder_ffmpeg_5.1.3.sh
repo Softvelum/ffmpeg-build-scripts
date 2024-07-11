@@ -169,6 +169,9 @@ build_libsvthevc() {
     git checkout .
     # latest current version of svt as of Oct 16, 2023
     git checkout 6cca5b932623d3a1953b165ae6b093ca1325ac44
+    # turn off all stdout library log
+    git apply ../svt_hevc_disable_printf.patch
+    # add -nimble suffix to library name
     sed -i -e 's/SvtHevcEnc$/SvtHevcEnc-nimble/' ./Source/Lib/Codec/CMakeLists.txt
     sed -i -e 's/SvtHevcEnc.pc/SvtHevcEnc-nimble.pc/' ./Source/Lib/Codec/CMakeLists.txt
     # update SvtHevcEncApp dependency name
@@ -307,7 +310,7 @@ build_ffmpeg() {
       build_with_nvenc=1
       build_with_quicksync=0
       echo "building FFmpeg for $codename with NVENC encoders/decoders support"
-  elif [ "$codename" == "focal" ] || [ "$codename" == "jammy" ]; then
+  elif [ "$codename" == "focal" ] || [ "$codename" == "jammy" ] || [ "$codename" == "noble" ]; then
       build_with_nvenc=1
       build_with_quicksync=1
       echo "building FFmpeg for $codename with NVENC/QUICKSYNC encoders/decoders support"
@@ -355,6 +358,12 @@ build_ffmpeg() {
         # to copy frame props of frame coming to main input to output frame
         md5sum -c vf_overlay_qsv.c.5.1.3.original.md5
         patch  ffmpeg-5.1.3/libavfilter/vf_overlay_qsv.c vf_overlay_qsv_frame_props.patch
+
+        # 'as' from binutils version > 2.40 used on Ubuntu 24.04 fails to compile inline assembly in mathops.h
+        # it was fixed in rev effadce6c7 in FFmpeg repository
+        if [ "$codename" == "noble" ]; then
+          cp libavcodec_x86_mathops.h.effadce6c7 ffmpeg-5.1.3/libavcodec/x86/mathops.h
+        fi
       fi
   fi
 
@@ -362,6 +371,7 @@ build_ffmpeg() {
   # for ubuntu 19.04 - apt-get install libfreetype-dev libmfx-dev libspeex-dev libva-dev nvidia-cuda-dev libnppicc10 libnppig10
   # for ubuntu 20.04 - apt-get install libfreetype-dev libmfx-dev libspeex-dev libva-dev nvidia-cuda-dev libnppicc10 libnppig10 nvidia-cuda-toolkit
   # for ubuntu 22.04 - apt-get install libfreetype-dev libmfx-dev libspeex-dev libva-dev nvidia-cuda-dev libnppicc11 libnppig11 nvidia-cuda-toolkit
+  # for ubuntu 24.04 - apt-get install libfreetype-dev libmfx-dev libspeex-dev libva-dev nvidia-cuda-dev nvidia-cuda-toolkit
 
   if [ $build_with_nvenc == 1 ]; then
       FFMPEG_ENCODERS="aac,png,mjpeg,h264_nvenc,hevc_nvenc"
@@ -394,7 +404,13 @@ build_ffmpeg() {
   FFMPEG_DECODERS+=",libdav1d"
   FFMPEG_ENCODERS+=",libaom_av1,libsvtav1"
 
-  cd ffmpeg-$FFMPEG_VERSION
+  FFMPEG_DECODERS+=",flac"
+
+  FFMPEG_DECODERS+=",apng"
+
+  FFMPEG_DECODERS+=",dvbsub"
+
+  pushd ffmpeg-$FFMPEG_VERSION
   if [ $build_with_nvenc == 1 ] && [ "$codename" == "jammy" ]; then
     # nvcc 11.5 on Ubuntu 22.04 fails during configure with the following error:
     # nvcc fatal   : Unsupported gpu architecture 'compute_30'
@@ -419,8 +435,9 @@ build_ffmpeg() {
     --enable-encoder=$FFMPEG_ENCODERS \
     --disable-muxers     \
     --disable-demuxers   \
-    --enable-demuxer=mov,image2,gif,mp3,webm_dash_manifest \
+    --enable-demuxer=mov,image2,gif,mp3,webm_dash_manifest,apng,mpegts \
     --disable-parsers    \
+    --enable-parser=h264,hevc,aac,opus,dvbsub \
     --disable-bsfs       \
     --disable-protocols  \
     --enable-protocol=file \
@@ -441,6 +458,74 @@ build_ffmpeg() {
     --disable-manpages
   make -j 4
   make install
+  popd
+}
+
+build_leptonica() {
+    if [ ! -d leptonica ]; then
+      git clone https://github.com/DanBloomberg/leptonica.git leptonica
+    fi
+
+    pushd leptonica
+    git checkout .
+    git checkout 1.82.0
+    rm -rf build
+    cmake -B build -DSW_BUILD=OFF -DCMAKE_C_FLAGS="-fPIC -DNO_CONSOLE_IO" -DCMAKE_CXX_FLAGS="-fPIC -DNO_CONSOLE_IO" \
+          -DCMAKE_INSTALL_PREFIX="$BUILD_DIR" -DBUILD_SHARED_LIBS=OFF \
+          -DCMAKE_DISABLE_FIND_PACKAGE_GIF=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_JPEG=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE \
+          -DCMAKE_DISABLE_FIND_PACKAGE_TIFF=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE
+    cmake --build build --config Release --parallel 4
+    cmake --install build
+    popd
+}
+
+get_os_codename() {
+  if [ -f /etc/lsb-release ]; then
+    grep -oP "^DISTRIB_CODENAME=\K.*" /etc/lsb-release
+  elif [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [ -n "$VERSION_CODENAME" ]; then
+      echo "$VERSION_CODENAME"
+    else
+      version_major=$(echo "$VERSION_ID" | cut -d. -f1)
+      echo "$ID$version_major"
+    fi
+  fi
+}
+
+build_tesseract() {
+    if [ ! -d tesseract ]; then
+      git clone https://github.com/tesseract-ocr/tesseract.git tesseract
+    fi
+
+    pushd tesseract
+    git checkout .
+
+    codename=$(get_os_codename)
+    if [ "$codename" == "bionic" ] || [ "$codename" == "focal" ] || [ "$codename" == "jammy" ] ||
+       [ "$codename" == "noble" ] || [ "$codename" == "buster" ] || [ "$codename" == "rocky9" ]; then
+      git checkout 5.3.4
+      patch CMakeLists.txt ../tesseract-nimble-5.patch
+    else
+      git checkout 4.1.3
+      patch CMakeLists.txt ../tesseract-nimble-4.patch
+    fi
+
+    rm -rf build
+    cmake -B build -DCMAKE_BUILD_TYPE=Release -DSW_BUILD=OFF -DCMAKE_INSTALL_PREFIX="$BUILD_DIR" -DCMAKE_INSTALL_LIBDIR=lib \
+          -DBUILD_TRAINING_TOOLS=OFF -DOPENMP_BUILD=OFF -DDISABLE_CURL=ON -DDISABLE_ARCHIVE=ON -DBUILD_SHARED_LIBS=ON \
+          -DINSTALL_CONFIGS=OFF -DLeptonica_DIR="$BUILD_DIR/lib/cmake/leptonica"
+    cmake --build build --config Release --target install --parallel 4
+    popd
+}
+
+download_tessdata() {
+    TESSDATA_DIR=$BUILD_DIR/share/tessdata
+
+    if [ ! -f $TESSDATA_DIR/eng.traineddata ]; then
+      mkdir -p $TESSDATA_DIR
+      wget https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/eng.traineddata -O $TESSDATA_DIR/eng.traineddata
+    fi
 }
 
 build_yasm
@@ -455,3 +540,7 @@ build_libaom
 build_libdav1d
 build_libsvtav1
 build_ffmpeg
+
+build_leptonica
+build_tesseract
+download_tessdata
