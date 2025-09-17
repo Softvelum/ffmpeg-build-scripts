@@ -1,0 +1,13 @@
+diff --git a/Source/Lib/Codec/EbDefinitions.h b/Source/Lib/Codec/EbDefinitions.h
+index d85bd4c..db0c26f 100644
+--- a/Source/Lib/Codec/EbDefinitions.h
++++ b/Source/Lib/Codec/EbDefinitions.h
+@@ -526,7 +526,7 @@ typedef void * EB_HANDLE;
+ #define MAX_POC UINT_MAX
+ #endif
+ 
+-#define LIB_PRINTF_ENABLE                1
++//#define LIB_PRINTF_ENABLE                1
+ #if LIB_PRINTF_ENABLE
+ #define SVT_LOG printf
+ #else

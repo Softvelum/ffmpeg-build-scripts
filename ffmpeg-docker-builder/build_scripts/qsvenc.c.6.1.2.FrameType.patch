@@ -1,0 +1,12 @@
+diff --git a/libavcodec/qsvenc.c b/libavcodec/qsvenc.c
+index a0144b0760..521cacc910 100644
+--- a/libavcodec/qsvenc.c
++++ b/libavcodec/qsvenc.c
+@@ -1766,6 +1766,7 @@ static void free_encoder_ctrl(mfxEncodeCtrl* enc_ctrl)
+ 
+         enc_ctrl->NumPayload = 0;
+         enc_ctrl->NumExtParam = 0;
++        enc_ctrl->FrameType = 0;
+     }
+ }
+ 

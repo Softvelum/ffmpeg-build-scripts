@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 87d88fa64..24429915e 100644
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -271,6 +271,7 @@ if(ENABLE_EXAMPLES)
+ endif()
+ 
+ add_library(aom ${AOM_SOURCES} $<TARGET_OBJECTS:aom_rtcd>)
++set_target_properties(aom PROPERTIES OUTPUT_NAME aom-nimble)
+ if(BUILD_SHARED_LIBS)
+   add_library(aom_static STATIC ${AOM_SOURCES} $<TARGET_OBJECTS:aom_rtcd>)
+   set_target_properties(aom_static PROPERTIES OUTPUT_NAME aom)

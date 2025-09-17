@@ -1,0 +1,40 @@
+# docker environment to build nimble transcoder libraries for Ubuntu 20.04
+#
+# Build and run:
+#   docker build -t nimble-ffmpeg-builder-ubuntu-20.04 -f Dockerfile .
+#   docker run -d nimble-ffmpeg-builder-ubuntu-20.04
+#
+# Copy files:
+# docker cp $CID:/home/builder/ffmpeg/build/lib ./lib
+
+FROM ubuntu:20.04
+
+RUN apt-get update
+RUN apt-get -y install apt-utils tzdata
+
+RUN apt-get -y install sudo rsync vim less wget curl tar git build-essential gcc g++ \
+                       make cmake meson ninja-build autoconf automake autopoint iproute2 python2-minimal
+
+# set /usr/bin/python as python2 to be used by default
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+RUN update-alternatives --set python /usr/bin/python2
+
+RUN useradd -G sudo -m -s /bin/bash builder \
+    && yes password | passwd builder \
+    && echo '\nbuilder  ALL=(ALL) NOPASSWD: /usr/bin/apt-get' >> /etc/sudoers
+
+# install ffmpeg dependencies
+RUN apt-get install -y \
+        fakeroot expect tcl devscripts pkg-config \
+        libssl-dev libxml2-dev libbz2-dev libzip-dev libjson-c-dev \
+        libfreetype6-dev libspeex-dev libtool avahi-utils \
+        libva-dev libnppicc10 libnppig10 libmfx-dev nvidia-cuda-toolkit
+
+USER builder
+RUN mkdir /home/builder/ffmpeg
+COPY build_scripts/* /home/builder/ffmpeg/
+
+# build ffmpeg libraries
+RUN cd /home/builder/ffmpeg \
+    && ./make_libs_ffmpeg_5.1.3.sh
