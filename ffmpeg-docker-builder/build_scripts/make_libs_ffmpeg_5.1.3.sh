@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#
-# IMPORTANT NOTE: follow how_2_upgrade_ffmpeg.txt and update it with latest libraries versions and tricks found during each upgrade
-#
-
 set -x
 set -e
 
