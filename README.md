@@ -4,7 +4,7 @@ Here you can find examples of FFmpeg build scripts which can be used for creatin
 
 ## Legal notice
 
-This article explains how to build custom third-party FFmpeg libraries and use them in Nimble Live Transcoder, alongside the libraries included in the standard Live Transcoder package. Each custom-built FFmpeg library is subject to its own licensing terms. Therefore, every library must be reviewed for licensing compliance before use or distribution, including any associated patent licensing terms. Softvelum is not responsible for any license or patent infringement that may result from the use of custom FFmpeg builds in Live Transcoder.
+This article explains how to build custom third-party FFmpeg libraries and use them in Nimble Live Transcoder, alongside the libraries included in the standard Live Transcoder package. Each custom-built FFmpeg library is subject to its own licensing terms. Therefore, every library must be reviewed for licensing compliance before use or distribution, including any associated patent licensing terms. The responsibility for ensuring proper licensing and avoiding any license or patent infringement lies solely with the party who builds and uses the custom FFmpeg libraries. Softvelum does not assume liability for any violations arising from such custom builds.
 
 ## Articles
 
